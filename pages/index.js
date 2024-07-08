@@ -97,7 +97,8 @@ export default function Home() {
             // userID,
             // getRandomName()
             appID,
-            tokenParams,
+            // tokenParams,
+            token,
             roomID,
             userID,
             usernameParams
