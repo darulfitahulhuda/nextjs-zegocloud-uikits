@@ -2,14 +2,13 @@ import Head from "next/head";
 import { useEffect, useRef } from "react";
 import config from "../lib/config";
 import { randomID, getUrlParams, getRandomName } from "../lib/util";
-import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 
 export default function Home() {
   const root = useRef();
 
   useEffect(() => {
     if (root) {
-      // const userID = randomID(5);
+      const userID = randomID(5);
       const appID = config.appID;
       let UIKitsConfig =
         JSON.parse(
@@ -19,11 +18,7 @@ export default function Home() {
             .replaceAll(/,\s+\}/gi, "}")
         ) || {};
       const roomID = getUrlParams().get("roomID") || randomID(5);
-      const tokenParams = getUrlParams().get("token") || "";
-      const usernameParams = getUrlParams().get("params") || "";
-      const userID = getUrlParams().get("userID") || "";
       let role = getUrlParams().get("role") || "Host";
-
       let sharedLinks = [];
       if (UIKitsConfig && UIKitsConfig.scenario && UIKitsConfig.scenario.mode) {
         if (UIKitsConfig.scenario.mode === "OneONoneCall") {
@@ -76,54 +71,35 @@ export default function Home() {
         }
       }
 
-      // const kitToken = zegoUIKitPrebuilt.generateKitTokenForProduction()
-
-      // const { ZegoUIKitPrebuilt } = await import(
-      //   "@zegocloud/zego-uikit-prebuilt"
-      // );
-      const kitToken = ZegoUIKitPrebuilt.generateKitTokenForProduction(
-        appID,
-        tokenParams,
-        roomID,
-        userID,
-        usernameParams,
-      );
-      const zp = ZegoUIKitPrebuilt.create(kitToken);
-      zp.joinRoom({
-        container: root.current,
-        sharedLinks,
-        ...UIKitsConfig,
-      });
-
-      // fetch("./api/token", {
-      //   method: "post",
-      //   body: JSON.stringify({
-      //     userID,
-      //     expiration: 1800,
-      //   }),
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      // })
-      //   .then((res) => res.json())
-      //   .then(async ({ token }) => {
-      //     const { ZegoUIKitPrebuilt } = await import(
-      //       "@zegocloud/zego-uikit-prebuilt"
-      //     );
-      //     const kitToken = ZegoUIKitPrebuilt.generateKitTokenForProduction(
-      //       appID,
-      //       token,
-      //       roomID,
-      //       userID,
-      //       getRandomName()
-      //     );
-      //     const zp = ZegoUIKitPrebuilt.create(kitToken);
-      //     zp.joinRoom({
-      //       container: root.current,
-      //       sharedLinks,
-      //       ...UIKitsConfig,
-      //     });
-      //   });
+      fetch("./api/token", {
+        method: "post",
+        body: JSON.stringify({
+          userID,
+          expiration: 7200,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.json())
+        .then(async ({ token }) => {
+          const { ZegoUIKitPrebuilt } = await import(
+            "@zegocloud/zego-uikit-prebuilt"
+          );
+          const kitToken = ZegoUIKitPrebuilt.generateKitTokenForProduction(
+            appID,
+            token,
+            roomID,
+            userID,
+            getRandomName()
+          );
+          const zp = ZegoUIKitPrebuilt.create(kitToken);
+          zp.joinRoom({
+            container: root.current,
+            sharedLinks,
+            ...UIKitsConfig,
+          });
+        });
     }
   }, []);
 
