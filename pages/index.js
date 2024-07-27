@@ -8,7 +8,7 @@ export default function Home() {
 
   useEffect(() => {
     if (root) {
-      // const userID = randomID(5);
+      const userID = randomID(5);
       const appID = config.appID;
       let UIKitsConfig =
         JSON.parse(
@@ -18,10 +18,6 @@ export default function Home() {
             .replaceAll(/,\s+\}/gi, "}")
         ) || {};
       const roomID = getUrlParams().get("roomID") || randomID(5);
-      const usernameParams = getUrlParams().get("username") || "companion";
-      const tokenParams = getUrlParams().get("token") || "";
-      const userID = getUrlParams().get("userID") || randomID(5);
-
       let role = getUrlParams().get("role") || "Host";
       let sharedLinks = [];
       if (UIKitsConfig && UIKitsConfig.scenario && UIKitsConfig.scenario.mode) {
@@ -79,7 +75,7 @@ export default function Home() {
         method: "post",
         body: JSON.stringify({
           userID,
-          expiration: 1800,
+          expiration: 7200,
         }),
         headers: {
           "Content-Type": "application/json",
@@ -91,17 +87,11 @@ export default function Home() {
             "@zegocloud/zego-uikit-prebuilt"
           );
           const kitToken = ZegoUIKitPrebuilt.generateKitTokenForProduction(
-            // appID,
-            // token,
-            // roomID,
-            // userID,
-            // getRandomName()
             appID,
-            // tokenParams,
             token,
             roomID,
             userID,
-            usernameParams
+            getRandomName()
           );
           const zp = ZegoUIKitPrebuilt.create(kitToken);
           zp.joinRoom({
@@ -132,7 +122,6 @@ export default function Home() {
           justify-content: center;
           align-items: center;
         }
-
         main {
           padding: 0;
           flex: 1;
@@ -156,7 +145,6 @@ export default function Home() {
             Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
             sans-serif;
         }
-
         * {
           box-sizing: border-box;
         }
